@@ -1,0 +1,110 @@
+groups:
+  - name: Windows_Disk_Alerts
+    rules:
+      - alert: WindowsServerDiskSpaceUsage_warning
+        expr: |
+          100.0 - 100 * (
+            (windows_logical_disk_free_bytes{volume!~"HarddiskVolume.*|C:\\\\Users.*"}) /
+            (windows_logical_disk_size_bytes{volume!~"HarddiskVolume.*|C:\\\\Users.*"})
+          ) > 90
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Windows Server Disk Space Usage (instance {{ $labels.instance }})"
+          description: |
+            Disk usage is more than 90%.
+            VALUE = {{ printf "%.0f" $value }}
+            LABELS = {{ $labels }}
+      - alert: WindowsServerDiskSpaceUsage_critical
+        expr: |
+          100.0 - 100 * (
+            (windows_logical_disk_free_bytes{volume!~"HarddiskVolume.*|C:\\\\Users.*"}) /
+            (windows_logical_disk_size_bytes{volume!~"HarddiskVolume.*|C:\\\\Users.*"})
+          ) > 95
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Windows Server Disk Space Usage (instance {{ $labels.instance }})"
+          description: |
+            Disk usage is more than 95%
+            VALUE = {{ printf "%.0f" $value }}
+            LABELS = {{ $labels }}
+      - alert: WindowsServerDiskSpaceUsage_emergency
+        expr: |
+          100.0 - 100 * (
+            (windows_logical_disk_free_bytes{volume!~"HarddiskVolume.*|C:\\\\Users.*"}) /
+            (windows_logical_disk_size_bytes{volume!~"HarddiskVolume.*|C:\\\\Users.*"})
+          ) > 98
+        for: 2m
+        labels:
+          severity: emergency
+        annotations:
+          summary: "Windows Server Disk Space Usage (instance {{ $labels.instance }})"
+          description: |
+            Disk usage is more than 98%
+            VALUE = {{ printf "%.0f" $value }}
+            LABELS = {{ $labels }}
+  - name: Windows_Memory_Alerts
+    rules:
+      - alert: WindowsServerMemoryUsage_warning
+        expr: 100 - ((windows_os_physical_memory_free_bytes / windows_cs_physical_memory_bytes) * 100) > 85
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: Windows Server memory Usage (instance {{ $labels.instance }})
+          description: |
+            Windows Server Memory Usage is more than 85%
+            VALUE = {{ printf "%.0f" $value }}
+            LABELS = {{ $labels }}
+      - alert: WindowsServerMemoryUsage_critical
+        expr: 100 - ((windows_os_physical_memory_free_bytes / windows_cs_physical_memory_bytes) * 100) > 95
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: Windows Server memory Usage (instance {{ $labels.instance }})
+          description:  |
+            Windows Server Memory Usage is more than 95%
+            VALUE = {{ printf "%.0f" $value }}
+            LABELS = {{ $labels }}
+  - name: Windows_CPU_Alerts
+    rules:
+      - alert: WindowsServerCpuUsage_warning
+        expr: 100 - (avg by (instance) (rate(windows_cpu_time_total{mode="idle"}[2m])) * 100) > 85
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: Windows Server CPU Usage (instance {{ $labels.instance }})
+          description: |
+            Windows Server CPU Usage is more than 85%
+            VALUE = {{ printf "%.0f" $value }}
+            LABELS = {{ $labels }}
+      - alert: WindowsServerCpuUsage_critical
+        expr: 100 - (avg by (instance) (rate(windows_cpu_time_total{mode="idle"}[2m])) * 100) > 95
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: Windows Server CPU Usage (instance {{ $labels.instance }})
+          description: |
+            Windows Server CPU Usage is more than 95%
+            VALUE = {{ printf "%.0f" $value }}
+            LABELS = {{ $labels }}
+
+  - name: windows-service-alerts
+    rules:
+      - alert: WindowsServiceDown
+        expr: windows_service_state{name="1C:Enterprise 8.3 Server Agent (x86-64)", state="running"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Windows Service {{ $labels.name }} is not running"
+          description: |
+            The Windows service '{{ $labels.name }}' is in state {{ $value }}.
+            Expected state: Running (4).
+            Runbook: [Provide a link to the troubleshooting guide if available]
