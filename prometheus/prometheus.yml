@@ -53,6 +53,11 @@ scrape_configs:
         - 'linux-01.domain.com:9200'
         labels:
           instance_host: linux-01
+    relabel_configs:
+      - source_labels: [__address__]
+        regex: '([^:]+):\d+'
+        target_label: instance
+        replacement: '${1}'
     tls_config:
       ca_file: /path-to/ca-certificate.pem
       cert_file: /path-to/prometheus-client-cert.pem
@@ -66,6 +71,11 @@ scrape_configs:
           - "_prometheus-windows-rdp._tcp.domain.com"
         type: "SRV"  # Use SRV to get IPs with ports
         refresh_interval: "30s"
+    relabel_configs:
+      - source_labels: [__address__]
+        regex: '([^:]+):\d+'
+        target_label: instance
+        replacement: '${1}'
     tls_config:
       ca_file: /path-to/ca-certificate.pem
       cert_file: /path-to/prometheus-client-cert.pem
@@ -80,6 +90,11 @@ scrape_configs:
           - "_prometheus-linux-web._tcp.domain.com"
         type: "SRV"  # Use SRV to get IPs with ports
         refresh_interval: "30s"
+    relabel_configs:
+      - source_labels: [__address__]
+        regex: '([^:]+):\d+'
+        target_label: instance
+        replacement: '${1}'
     tls_config:
       ca_file: /path-to/ca-certificate.pem
       cert_file: /path-to/prometheus-client-cert.pem
@@ -93,6 +108,11 @@ scrape_configs:
           - "_prometheus-linux-db._tcp.domain.com"
         type: "SRV"  # Use SRV to get IPs with ports
         refresh_interval: "30s"
+    relabel_configs:
+      - source_labels: [__address__]
+        regex: '([^:]+):\d+'
+        target_label: instance
+        replacement: '${1}'
     tls_config:
       ca_file: /path-to/ca-certificate.pem
       cert_file: /path-to/prometheus-client-cert.pem
