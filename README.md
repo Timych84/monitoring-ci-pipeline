@@ -42,6 +42,8 @@ You must define these CI/CD variables in GitLab:
 | `SERVER_PORT` | SSH port  |
 | `SERVER_PROM_PATH` | Remote path for Prometheus configs |
 | `SERVER_ALERTMANAGER_PATH` | Remote path for Alertmanager config |
+| `ALERTMANAGER_RELOAD_URL` | URL to reload Alertmanager configuration |
+| `PROMETHEUS_RELOAD_URL` |  URL to reload Prometheus configuration |
 
 Also you must define these Alertmanager parameters(used in Alertmanager config template) via CI/CD variables in Gitlab:
 | Variable | Description |
