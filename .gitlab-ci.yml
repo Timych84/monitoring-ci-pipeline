@@ -16,13 +16,13 @@ build-ci-image:
     IMAGE_NAME: ${CI_PROJECT_PATH}:${CI_COMMIT_SHORT_SHA}
   script:
     - docker build  -t $TAG_LATEST validate/.
-    - docker login -u ${CI_REGISTRY_USER} -p ${CI_JOB_TOKEN} ${CI_REGISTRY}    
-    - docker push $TAG_LATEST    
+    - docker login -u ${CI_REGISTRY_USER} -p ${CI_JOB_TOKEN} ${CI_REGISTRY}
+    - docker push $TAG_LATEST
     - docker images "$CI_REGISTRY_IMAGE/$CI_COMMIT_REF_NAME" --format '{{.Repository}}:{{.Tag}}\t{{.ID}}'
-    - docker images "registry.d-wise.ru/timych/prom-config/master" --format '{{.Repository}}:{{.Tag}}\t{{.ID}}' | awk '$1 !~ /:latest$/ { print $2 }'| xargs -r docker rmi
-  # only:
-  #   changes:
-  #     - Dockerfile
+    - docker images "$CI_REGISTRY_IMAGE/$CI_COMMIT_REF_NAME" --format '{{.Repository}}:{{.Tag}}\t{{.ID}}' | awk '$1 !~ /:latest$/ { print $2 }'| xargs -r docker rmi
+  only:
+    changes:
+      - validate/Dockerfile
   tags:
     - docker
 
@@ -74,7 +74,7 @@ deploy-prometheus:
     - chmod 700 ~/.ssh
     - ssh-keyscan -p $SERVER_PORT $SERVER_HOST >> ~/.ssh/known_hosts
   script:
-    - rsync -avz  --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --rsync-path="sudo rsync"  ./prometheus/ $SERVER_USER@$SERVER_HOST:$SERVER_PROM_PATH    
+    - rsync -avz  --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --rsync-path="sudo rsync"  ./prometheus/ $SERVER_USER@$SERVER_HOST:$SERVER_PROM_PATH
     - curl -X POST http://$SERVER_HOST:9090/-/reload
     - ssh-agent -k
 
